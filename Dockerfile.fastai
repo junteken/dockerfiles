@@ -1,0 +1,44 @@
+FROM ufoym/deepo:all-jupyter-py36-cu100
+
+EXPOSE 8888
+
+RUN rm /bin/sh && ln -s /bin/bash /bin/sh
+RUN useradd beanzsoft
+USER $beanzsoft
+#make folder connected to container
+RUN mkdir -p /home/$USER/data
+RUN pip install ipykernel
+
+#download miniconda
+RUN curl -o /home/$USER/miniconda.sh https://repo.anaconda.com/miniconda/Miniconda3-py37_4.10.3-Linux-x86_64.sh
+RUN chmod +x /home/$USER/miniconda.sh && \
+/home/$USER/miniconda.sh -b -p /home/$USER/miniconda && \
+/home/$USER/miniconda/bin/conda install numpy pyyaml mkl mkl-include setuptools cmake cffi typing ipython && \
+/home/$USER/miniconda/bin/conda install opencv && \
+/home/$USER/miniconda/bin/conda clean -ya
+
+ENV PATH /home/$USER/miniconda/bin:${PATH}
+
+#make fastai kernel spec
+RUN conda create -n fastai python=3.7
+RUN activate fastai
+RUN conda install -c fastchan fastai
+RUN pip install ipykernel 
+RUN python -m ipykernel install --user --name fastai --display-name "fastai"
+RUN source deactivate
+
+# add additional kernel spec like upper fastai kernel spec
+RUN conda create -n example python=3.7
+RUN activate example
+RUN pip install ipykernel 
+RUN python -m ipykernel install --user --name example --display-name "example"
+RUN source deactivate
+
+RUN jupyter notebook --generate-config
+# RUN jupyter serverextension enable --py jupyterlab --sys-prefix
+#RUN pip install plotly && \
+#    conda install -c conda-forge nodejs && \
+#    jupyter labextension install @jupyterlab/plotly-extension
+
+#execute jupyter notebook
+CMD ["jupyter", "notebook", "--no-browser", "--ip=0.0.0.0", "--allow-root", "--NotebookApp.token=", "--notebook-dir='/home'"]
