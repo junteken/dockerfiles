@@ -11,6 +11,7 @@ RUN chown ${UNAME} /home/${UNAME}
 
 WORKDIR /home/${UNAME}
 ENV PATH /home/${UNAME}/anaconda/bin:${PATH}
+# don't change anaconda version 
 RUN curl -o anaconda.sh https://repo.anaconda.com/archive/Anaconda3-5.2.0-Linux-x86_64.sh
 RUN chmod +x anaconda.sh && \
 ./anaconda.sh -b -p /home/${UNAME}/anaconda
@@ -19,19 +20,23 @@ RUN conda update --all
 RUN ./anaconda/bin/conda install numpy pyyaml mkl mkl-include setuptools cmake cffi typing ipython
 RUN ./anaconda/bin/conda install opencv 
 RUN ./anaconda/bin/conda clean -ya
-
+RUN export TORCH_CUDA_ARCH_LIST=8.6 # RTX 3090, A6000
 # USER root
 
-# RUN source ./anaconda/etc/profile.d/conda.sh
+RUN source ./anaconda/etc/profile.d/conda.sh
 # full-stack-deep-learning
 RUN mkdir -p /home/${UNAME}/fsdl
 WORKDIR /home/${UNAME}/fsdl
-RUN git clone https://github.com/full-stack-deep-learning/fsdl-text-recognizer-2021-labs.git
+#RUN git clone https://github.com/junteken/fsdl-text-recognizer-2021-labs.git
+COPY ./fsdl-text-recognizer-2021-labs /home/${UNAME}/fsdl/fsdl-text-recognizer-2021-labs
 WORKDIR /home/${UNAME}/fsdl/fsdl-text-recognizer-2021-labs
 RUN conda env update --prune -f environment.yml && \
 source /home/${UNAME}/anaconda/etc/profile.d/conda.sh && \
 source activate fsdl-text-recognizer-2021 && \
 conda install pip && \
+pip install torch==1.7.1+cu110 torchvision==0.8.2+cu110 -f https://download.pytorch.org/whl/torch_stable.html && \
+# conda install pytorch torchvision torchaudio cudatoolkit=11.3 -c pytorch && \ <--same result(no kernel image)
+# conda install cudatoolkit=11.0 && \
 pip install pip-tools && \
 pip-compile ./requirements/prod.in && \
 pip-compile ./requirements/dev.in && \
