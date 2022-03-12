@@ -9,6 +9,10 @@ RUN mkdir -p /home/${UNAME}
 RUN chown ${UNAME} /home/${UNAME}
 # USER ${UNAME}
 
+RUN apt-get update && apt-get -y install net-tools openssh-server
+RUN sed -i "s|#Port 22|Port 7001 |g" /etc/ssh/sshd_config
+RUN sed -i "s|#PermitRootLogin prohibit-password|PermitRootLogin yes |g" /etc/ssh/sshd_config
+
 WORKDIR /home/${UNAME}
 ENV PATH /home/${UNAME}/anaconda/bin:${PATH}
 # don't change anaconda version 
