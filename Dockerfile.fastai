@@ -12,6 +12,7 @@ RUN chown ${UNAME} /home/${UNAME}
 RUN apt-get update && apt-get -y install net-tools openssh-server
 RUN sed -i "s|#Port 22|Port 7001 |g" /etc/ssh/sshd_config
 RUN sed -i "s|#PermitRootLogin prohibit-password|PermitRootLogin yes |g" /etc/ssh/sshd_config
+RUN service ssh start
 
 WORKDIR /home/${UNAME}
 ENV PATH /home/${UNAME}/anaconda/bin:${PATH}
