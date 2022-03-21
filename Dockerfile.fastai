@@ -9,7 +9,8 @@ RUN mkdir -p /home/${UNAME}
 RUN chown ${UNAME} /home/${UNAME}
 # USER ${UNAME}
 
-RUN apt-get update && apt-get -y install net-tools openssh-server jekyll
+RUN apt-get update && apt-get -y install net-tools openssh-server bundler
+RUN sudo gem install jekyll jekyll-feed jekyll-gist jekyll-paginate jekyll-sass-converter jekyll-coffeescript 
 RUN sed -i "s|#Port 22|Port 7001 |g" /etc/ssh/sshd_config
 RUN sed -i "s|#PermitRootLogin prohibit-password|PermitRootLogin yes |g" /etc/ssh/sshd_config
 RUN service ssh start
@@ -50,7 +51,7 @@ pip install ipykernel && \
 python -m ipykernel install --user --name fsdl2021 --display-name "fsdl2021" 
 
 #make fastai kernel spec
-RUN conda create -n fastai python=3.7 && \
+RUN conda create -n fastai python=3.7 nbdev && \
 source /home/${UNAME}/anaconda/etc/profile.d/conda.sh && \
 source activate fastai && \
 conda install pip && \
