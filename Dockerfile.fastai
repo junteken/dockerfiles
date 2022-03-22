@@ -44,6 +44,7 @@ pip install torch==1.7.1+cu110 torchvision==0.8.2+cu110 -f https://download.pyto
 # conda install pytorch torchvision torchaudio cudatoolkit=11.3 -c pytorch && \ <--same result(no kernel image)
 # conda install cudatoolkit=11.0 && \
 pip install pip-tools && \
+pip install streamlit && \
 pip-compile ./requirements/prod.in && \
 pip-compile ./requirements/dev.in && \
 pip-sync ./requirements/prod.txt ./requirements/dev.txt && \
@@ -51,12 +52,13 @@ pip install ipykernel && \
 python -m ipykernel install --user --name fsdl2021 --display-name "fsdl2021" 
 
 #make fastai kernel spec
-RUN conda create -n fastai python=3.7 nbdev && \
+RUN conda create -n fastai python=3.7 && \
 source /home/${UNAME}/anaconda/etc/profile.d/conda.sh && \
 source activate fastai && \
 conda install pip && \
 conda install -c fastchan fastai && \
 pip install ipykernel && \
+pip install nbdev && \
 python -m ipykernel install --user --name fastai --display-name "fastai" 
 
 RUN jupyter notebook --generate-config
