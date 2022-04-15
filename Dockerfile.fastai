@@ -68,6 +68,7 @@ RUN jupyter notebook --generate-config
 #    jupyter labextension install @jupyterlab/plotly-extension
 #
 
+ENV PYTHONPATH=.:$PYTHONPATH
 
 #execute jupyter notebook
 CMD ["jupyter", "notebook", "--no-browser", "--ip=0.0.0.0", "--allow-root", "--NotebookApp.token=", "--notebook-dir='/home'"]
